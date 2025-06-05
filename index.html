@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompiler - AI-Powered Code Optimization</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #111113;
+            --bg-tertiary: #1a1a1c;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: rgba(99, 102, 241, 0.1);
+            --border: #27272a;
+            --border-hover: #3f3f46;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+            scroll-behavior: smooth;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+            background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-10px, -10px) rotate(1deg); }
+            66% { transform: translate(10px, -5px) rotate(-1deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.125rem);
+            color: var(--text-tertiary);
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta {
+            background: var(--accent);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .cta:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .cta:hover::before {
+            transform: translateX(100%);
+        }
+
+        .cta-secondary {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        .cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Sections */
+        .section {
+            padding: clamp(4rem, 10vw, 8rem) 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: clamp(3rem, 8vw, 5rem);
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.125rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Demo Section */
+        .demo-container {
+            display: grid;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .demo {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient);
+        }
+
+        .demo:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .demo-title {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .demo-badge {
+            background: var(--success);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .demo-badge.baseline {
+            background: var(--text-tertiary);
+        }
+
+        .code-line {
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .keyword { color: #ff7ac6; }
+        .string { color: #18dcc8; }
+        .comment { color: var(--text-tertiary); }
+        .number { color: #ffb86c; }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Comparison Section */
+        .comparison {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comparison::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .comparison-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .traditional { color: #ff6b6b; }
+        .ai { color: var(--accent); }
+
+        .comparison-item {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid;
+            transition: transform 0.2s ease;
+        }
+
+        .comparison-item:hover {
+            transform: translateX(4px);
+        }
+
+        .comparison-item.traditional { border-left-color: #ff6b6b; }
+        .comparison-item.ai { border-left-color: var(--accent); }
+
+        .comparison-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .comparison-item p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Stats Grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+
+        .stat:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cta-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .demo-container {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Utility Classes */
+        .opacity-0 { opacity: 0; }
+        .translate-y-8 { transform: translateY(2rem); }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="logo">Kompiler</h1>
+            <p class="tagline">AI-powered compilation. Intelligent optimization.</p>
+            <p class="subtitle">Machine learning finds optimizations traditional compilers miss</p>
+            <div class="cta-group">
+                <a href="#features" class="cta">Explore Features</a>
+                <a href="#benchmarks" class="cta cta-secondary">View Benchmarks</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Real Performance Gains</h2>
+                <p class="section-subtitle">See how Kompiler's neural networks identify and apply optimizations that traditional heuristics completely overlook</p>
+            </div>
+            
+            <div class="demo-container">
+                <div class="demo">
+                    <div class="demo-header">
+                        <span class="demo-title">Traditional Compiler Output</span>
+                        <span class="demo-badge baseline">Baseline</span>
+                    </div>
+                    <div class="code-line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) {</div>
+                    <div class="code-line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; m; j++) {</div>
+                    <div class="code-line">        result[i] += data[j * stride + i] * weight[j];</div>
+                    <div class="code-line">    }</div>
+                    <div class="code-line">}</div>
+                </div>
+
+                <div class="demo">
+                    <div class="demo-header">
+                        <span class="demo-title">Kompiler AI Optimization</span>
+                        <span class="demo-badge">8.4x Faster</span>
+                    </div>
+                    <div class="code-line"><span class="comment">// AI detected cache-hostile pattern, applied loop interchange + vectorization</span></div>
+                    <div class="code-line"><span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; m; j += <span class="number">8</span>) {</div>
+                    <div class="code-line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i += <span class="number">4</span>) {</div>
+                    <div class="code-line">        _mm256_fmadd_ps(data_vec, weight_vec, result_vec);</div>
+                    <div class="code-line">    }</div>
+                    <div class="code-line">}</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="features">
+            <div class="section-header">
+                <h2 class="section-title">Advanced AI Techniques</h2>
+                <p class="section-subtitle">Built on cutting-edge machine learning research in compiler optimization</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature">
+                    <h3 class="feature-title">Neural Pattern Recognition</h3>
+                    <p class="feature-description">Deep learning models trained on millions of code patterns identify optimization opportunities invisible to traditional heuristics.</p>
+                    <ul class="feature-list">
+                        <li>Transformer-based code analysis</li>
+                        <li>Cross-function optimization discovery</li>
+                        <li>Hardware-aware pattern matching</li>
+                    </ul>
+                </div>
+
+                <div class="feature">
+                    <h3 class="feature-title">Reinforcement Learning</h3>
+                    <p class="feature-description">RL agents explore optimization spaces, learning the perfect sequence of transformations through millions of compilation experiments.</p>
+                    <ul class="feature-list">
+                        <li>Phase ordering optimization</li>
+                        <li>Dynamic optimization scheduling</li>
+                        <li>Multi-objective reward systems</li>
+                    </ul>
+                </div>
+
+                <div class="feature">
+                    <h3 class="feature-title">Performance Prediction</h3>
+                    <p class="feature-description">Sophisticated models predict runtime behavior before compilation, enabling optimization decisions based on actual performance.</p>
+                    <ul class="feature-list">
+                        <li>Cache behavior modeling</li>
+                        <li>Branch prediction analysis</li>
+                        <li>Memory bandwidth optimization</li>
+                    </ul>
+                </div>
+
+                <div class="feature">
+                    <h3 class="feature-title">Auto-Vectorization</h3>
+                    <p class="feature-description">AI discovers vectorization opportunities that traditional compilers miss, automatically generating optimal SIMD code.</p>
+                    <ul class="feature-list">
+                        <li>Complex dependency analysis</li>
+                        <li>Optimal instruction selection</li>
+                        <li>Pipeline utilization maximization</li>
+                    </ul>
+                </div>
+
+                <div class="feature">
+                    <h3 class="feature-title">Memory Layout Optimization</h3>
+                    <p class="feature-description">Intelligent data structure reorganization and access pattern optimization for modern memory hierarchies.</p>
+                    <ul class="feature-list">
+                        <li>Cache-aware data placement</li>
+                        <li>Prefetch instruction insertion</li>
+                        <li>Loop nest optimization</li>
+                    </ul>
+                </div>
+
+                <div class="feature">
+                    <h3 class="feature-title">Correctness Guarantees</h3>
+                    <p class="feature-description">Formal verification ensures all optimizations preserve program semantics while maximizing performance gains.</p>
+                    <ul class="feature-list">
+                        <li>Automated correctness proofs</li>
+                        <li>Semantic equivalence checking</li>
+                        <li>Comprehensive test generation</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Why Traditional Compilers Fall Short</h2>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-grid">
+                    <div>
+                        <h3 class="comparison-title traditional">Traditional Compilers</h3>
+                        <div class="comparison-item traditional">
+                            <h4>Static Heuristics</h4>
+                            <p>Fixed rules written decades ago, unable to adapt to modern hardware or code patterns</p>
+                        </div>
+                        <div class="comparison-item traditional">
+                            <h4>Local Optimization</h4>
+                            <p>Optimize functions in isolation, missing cross-module optimization opportunities</p>
+                        </div>
+                        <div class="comparison-item traditional">
+                            <h4>Conservative Approach</h4>
+                            <p>Prioritize compile safety over performance, leaving significant gains on the table</p>
+                        </div>
+                        <div class="comparison-item traditional">
+                            <h4>Limited Analysis</h4>
+                            <p>Simple pattern matching cannot handle complex, multi-level optimization dependencies</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="comparison-title ai">Kompiler AI</h3>
+                        <div class="comparison-item ai">
+                            <h4>Learned Patterns</h4>
+                            <p>AI discovers optimization patterns from millions of real codebases and performance profiles</p>
+                        </div>
+                        <div class="comparison-item ai">
+                            <h4>Global Optimization</h4>
+                            <p>Whole-program analysis enables aggressive cross-function and cross-module optimizations</p>
+                        </div>
+                        <div class="comparison-item ai">
+                            <h4>Performance First</h4>
+                            <p>Maximize performance while maintaining correctness through formal verification</p>
+                        </div>
+                        <div class="comparison-item ai">
+                            <h4>Deep Understanding</h4>
+                            <p>Neural networks model complex interactions between code, compiler, and hardware</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="benchmarks">
+            <div class="section-header">
+                <h2 class="section-title">Performance Benchmarks</h2>
+                <p class="section-subtitle">Measured improvements over GCC -O3 and Clang -O3 across industry-standard benchmarks</p>
+            </div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">8.4x</span>
+                    <span class="stat-label">Matrix Operations</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">4.2x</span>
+                    <span class="stat-label">Image Processing</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">6.7x</span>
+                    <span class="stat-label">Scientific Computing</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">3.1x</span>
+                    <span class="stat-label">Database Queries</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">5.3x</span>
+                    <span class="stat-label">Cryptographic Functions</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">4.8x</span>
+                    <span class="stat-label">Graph Algorithms</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>Kompiler © 2025 • Powered by AI</p>
+    </footer>
+
+    <script>
+        // Enhanced smooth scrolling for CTA buttons
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Enhanced intersection observer with staggered animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        entry.target.classList.add('animate-in');
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        // Apply animations to elements
+        const animatedElements = document.querySelectorAll('.feature, .stat, .comparison-item, .demo');
+        animatedElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+            observer.observe(el);
+        });
+
+        // Parallax effect for hero background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const rate = scrolled * -0.5;
+            const hero = document.querySelector('.hero::before');
+            if (hero) {
+                document.querySelector('.hero').style.transform = `translateY(${rate}px)`;
+            }
+        });
+
+        // Add subtle mouse movement parallax to hero
+        document.addEventListener('mousemove', (e) => {
+            const hero = document.querySelector('.hero');
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            
+            hero.style.backgroundPosition = `${x}% ${y}%`;
+        });
+    </script>
+</body>
+</html>
